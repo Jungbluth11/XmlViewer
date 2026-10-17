@@ -1,0 +1,13 @@
+{
+	"translations": {
+		"XML Viewer": "XML-Ansicht",
+		"Download": "Herunterladen",
+		"Close": "Schließen",
+		"Close and return to files": "Schließen und zu Dateien zurückkehren",
+		"Please sign in or open the file through a public share.": "Bitte melde dich an oder öffne die Datei über eine öffentliche Freigabe.",
+		"The XML file could not be found.": "Die XML-Datei wurde nicht gefunden.",
+		"The share or XML file could not be found.": "Die Freigabe oder XML-Datei wurde nicht gefunden.",
+		"The XML file could not be found or is not part of this share.": "Die XML-Datei wurde nicht gefunden oder ist nicht Teil dieser Freigabe."
+	},
+	"pluralForm": "nplurals=2; plural=(n != 1);"
+}
