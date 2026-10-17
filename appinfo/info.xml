@@ -6,16 +6,16 @@
 	<name lang="en">XML Viewer</name>
 	<summary lang="de">Zeigt XML-Dateien in einer strukturierten Ansicht</summary>
 	<summary lang="en">Displays XML files in a structured view</summary>
-	<author mail="mail@jungbluthcloud.de" homepage="">Sven Schaefer</author>
+	<author mail="mail@jungbluthcloud.de">Sven Schaefer</author>
 	<bugs>https://github.com/Jungbluth11/Xmlviewer</bugs>
 	<description lang="de"><![CDATA[Öffnet XML-Dateien aus Nextcloud Dateien in einer strukturierten Ansicht, wenn ein Parser für ihre XML-Struktur installiert ist. Ohne passenden Parser wird die Datei an den nativen Nextcloud-Viewer übergeben.]]></description>
 	<description lang="en"><![CDATA[Opens XML files from Nextcloud Files in a structured view when a parser for their XML structure is installed. Without a matching parser, the file is handed over to the native Nextcloud viewer.]]></description>
 	<version>1.0.0</version>
 	<licence>AGPL-3.0-or-later</licence>
 	<author>Jungbluth11</author>
-	<namespace>Xmlviewer</namespace>
+	<namespace>XmlViewer</namespace>
 	<category>files</category>
 	<dependencies>
-		<nextcloud min-version="28" max-version="32" />
+		<nextcloud min-version="33" max-version="35" />
 	</dependencies>
 </info>

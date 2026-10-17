@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace OCA\Xmlviewer\Parser;
+namespace OCA\XmlViewer\Parser;
 
 final class XmlParserRegistry {
 	private static ?array $registeredParsers = null;

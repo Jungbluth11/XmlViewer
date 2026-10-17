@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace OCA\Xmlviewer\Controller;
+namespace OCA\XmlViewer\Controller;
 
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\RedirectResponse;
@@ -214,7 +214,7 @@ class ViewController extends Controller {
 			return $this->nativeViewerResponse($fileId, $backUrl, $shareToken);
 		}
 		
-		$parser = (new \OCA\Xmlviewer\Parser\XmlParserRegistry())->findParser($xml);
+		$parser = (new \OCA\XmlViewer\Parser\XmlParserRegistry())->findParser($xml);
 		$viewData = $parser?->parse($xml, $source);
 		
 		if ($parser === null || $viewData === null) {

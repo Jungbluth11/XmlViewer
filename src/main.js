@@ -1,4 +1,4 @@
-import { DefaultType, FileAction, registerFileAction } from '@nextcloud/files'
+import { DefaultType, registerFileAction } from '@nextcloud/files'
 
 function isXmlMimeType(file) {
 	const mime = String(file.mime || '').toLowerCase().split(';')[0].trim()
@@ -42,8 +42,8 @@ if (directShareMatch && !nativeViewerFallbackFileId && !isPublicFolderFallback &
 	window.location.assign(`${rootViewerUrl}?${new URLSearchParams({ backUrl }).toString()}`)
 }
 
-// On Nextcloud 28, opening a nested file through openfile may only reload the
-// public folder listing. Reuse the native row click once the listing exists.
+// Opening a nested file through openfile on public shares may only reload the
+// folder listing. Reuse the native row click once the listing exists.
 const publicShareMatch = window.location.pathname.match(/(?:^|\/)s\/([^/]+)/)
 const isFolderFileFallback = new URLSearchParams(window.location.search).get('xmlviewerFallbackType') === 'folder'
 if (publicShareMatch && isFolderFileFallback && nativeViewerFallbackFileId && /^\d+$/.test(nativeViewerFallbackFileId)) {
@@ -71,18 +71,19 @@ if (publicShareMatch && isFolderFileFallback && nativeViewerFallbackFileId && /^
 	}
 }
 
-const xmlAction = new FileAction({
+const xmlAction = {
 	id: 'xmlviewer-open-table',
 	displayName: () => 'Als Tabelle öffnen',
 	iconSvgInline: () => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M3 4h18v16H3zm2 2v3h5V6zm7 0v3h7V6zM5 11v3h5v-3zm7 0v3h7v-3zm-7 5v2h5v-2zm7 0v2h7v-2z"/></svg>',
 	default: DefaultType.DEFAULT,
-	enabled(files) {
-		return files.length === 1
-			&& files[0].type === 'file'
-			&& String(files[0].fileid) !== nativeViewerFallbackFileId
-			&& isXmlMimeType(files[0])
+	enabled({ nodes }) {
+		return nodes.length === 1
+			&& nodes[0].type === 'file'
+			&& String(nodes[0].fileid) !== nativeViewerFallbackFileId
+			&& isXmlMimeType(nodes[0])
 	},
-	async exec(file) {
+	async exec({ nodes }) {
+		const file = nodes[0]
 		const currentFilesUrl = getBackUrl()
 		const shareMatch = window.location.pathname.match(/(?:^|\/)s\/([^/]+)/)
 		const viewerUrl = shareMatch
@@ -92,13 +93,12 @@ const xmlAction = new FileAction({
 		window.location.assign(`${viewerUrl}?${params.toString()}`)
 		return true
 	},
-})
+}
 
 registerFileAction(xmlAction)
 
-// The public link page in Nextcloud 28 uses a separate file list from Files.
-// Intercept only clicks on XML file rows there, so anonymous visitors can use
-// the same table view while all other files keep the native public viewer.
+// Public link pages can use a separate file list from Files. Intercept only
+// clicks on XML file rows there so other files keep the native public viewer.
 if (/\/(?:index\.php\/)?s\/[^/]+/.test(window.location.pathname)) {
 	document.addEventListener('click', (event) => {
 		const link = event.target.closest('a[href]')

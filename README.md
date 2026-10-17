@@ -11,7 +11,7 @@ The action in the Files app is offered based on the XML MIME type provided by Ne
 
 ## Requirements and compatibility
 
-- Nextcloud Server 28+
+- Nextcloud Server 33+
 
 ## Installation
 
@@ -38,9 +38,9 @@ Example of a simple XML document:
 <?php
 declare(strict_types=1);
 
-namespace OCA\Xmlviewer\Parser\Catalog;
+namespace OCA\XmlViewer\Parser\Catalog;
 
-use OCA\Xmlviewer\Parser\XmlParserInterface;
+use OCA\XmlViewer\Parser\XmlParserInterface;
 
 class Parser implements XmlParserInterface {
 	public function supportsRoot(string $rootNode): bool {

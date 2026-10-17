@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace OCA\Xmlviewer\Parser;
+namespace OCA\XmlViewer\Parser;
 
 interface XmlParserInterface {
 	public function supportsRoot(string $rootNode): bool;
