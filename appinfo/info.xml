@@ -10,7 +10,7 @@
 	<bugs>https://github.com/Jungbluth11/Xmlviewer</bugs>
 	<description lang="de"><![CDATA[Öffnet XML-Dateien aus Nextcloud Dateien in einer strukturierten Ansicht, wenn ein Parser für ihre XML-Struktur installiert ist. Ohne passenden Parser wird die Datei an den nativen Nextcloud-Viewer übergeben.]]></description>
 	<description lang="en"><![CDATA[Opens XML files from Nextcloud Files in a structured view when a parser for their XML structure is installed. Without a matching parser, the file is handed over to the native Nextcloud viewer.]]></description>
-	<version>1.0.0</version>
+	<version>2.0.0</version>
 	<licence>AGPL-3.0-or-later</licence>
 	<author>Jungbluth11</author>
 	<namespace>XmlViewer</namespace>
