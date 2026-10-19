@@ -72,11 +72,11 @@ class Parser implements XmlParserInterface {
 return new Parser();
 ```
 
-The template at `lib/Parser/Catalog/template.php` receives the returned array as `$data` and can display it like this:
+The template at `lib/Parser/Catalog/template.php` receives the returned array as `$_['data']` and can display it like this:
 
 ```php
 <ul>
-<?php foreach ($data['items'] as $item): ?>
+<?php foreach ($_['data']['items'] as $item): ?>
     <li><?php p($item['name']); ?> (<?php p($item['category']); ?>)</li>
 <?php endforeach; ?>
 </ul>
