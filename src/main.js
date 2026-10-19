@@ -1,5 +1,24 @@
 import { DefaultType, FileAction, registerFileAction } from '@nextcloud/files'
 
+function loadParserScript() {
+	const viewer = document.getElementById('xmlviewer')
+	const scriptUrl = viewer?.dataset.parserScriptUrl
+	if (!scriptUrl) {
+		return
+	}
+
+	const script = document.createElement('script')
+	script.src = scriptUrl
+	script.async = true
+	document.head.append(script)
+}
+
+if (document.readyState === 'loading') {
+	document.addEventListener('DOMContentLoaded', loadParserScript, { once: true })
+} else {
+	loadParserScript()
+}
+
 function isXmlMimeType(file) {
 	const mime = String(file.mime || '').toLowerCase().split(';')[0].trim()
 	const aliases = window.OC?.MimeTypeList?.aliases || {}
@@ -42,8 +61,8 @@ if (directShareMatch && !nativeViewerFallbackFileId && !isPublicFolderFallback &
 	window.location.assign(`${rootViewerUrl}?${new URLSearchParams({ backUrl }).toString()}`)
 }
 
-// On Nextcloud 28, opening a nested file through openfile may only reload the
-// public folder listing. Reuse the native row click once the listing exists.
+// Opening a nested file through openfile on public shares may only reload the
+// folder listing. Reuse the native row click once the listing exists.
 const publicShareMatch = window.location.pathname.match(/(?:^|\/)s\/([^/]+)/)
 const isFolderFileFallback = new URLSearchParams(window.location.search).get('xmlviewerFallbackType') === 'folder'
 if (publicShareMatch && isFolderFileFallback && nativeViewerFallbackFileId && /^\d+$/.test(nativeViewerFallbackFileId)) {
@@ -91,14 +110,13 @@ const xmlAction = new FileAction({
 		const params = new URLSearchParams({ backUrl: currentFilesUrl })
 		window.location.assign(`${viewerUrl}?${params.toString()}`)
 		return true
-	},
+ 	},
 })
 
 registerFileAction(xmlAction)
 
-// The public link page in Nextcloud 28 uses a separate file list from Files.
-// Intercept only clicks on XML file rows there, so anonymous visitors can use
-// the same table view while all other files keep the native public viewer.
+// Public link pages can use a separate file list from Files. Intercept only
+// clicks on XML file rows there so other files keep the native public viewer.
 if (/\/(?:index\.php\/)?s\/[^/]+/.test(window.location.pathname)) {
 	document.addEventListener('click', (event) => {
 		const link = event.target.closest('a[href]')
