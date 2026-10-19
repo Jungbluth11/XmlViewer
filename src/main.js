@@ -1,5 +1,24 @@
 import { DefaultType, registerFileAction } from '@nextcloud/files'
 
+function loadParserScript() {
+	const viewer = document.getElementById('xmlviewer')
+	const scriptUrl = viewer?.dataset.parserScriptUrl
+	if (!scriptUrl) {
+		return
+	}
+
+	const script = document.createElement('script')
+	script.src = scriptUrl
+	script.async = true
+	document.head.append(script)
+}
+
+if (document.readyState === 'loading') {
+	document.addEventListener('DOMContentLoaded', loadParserScript, { once: true })
+} else {
+	loadParserScript()
+}
+
 function isXmlMimeType(file) {
 	const mime = String(file.mime || '').toLowerCase().split(';')[0].trim()
 	const aliases = window.OC?.MimeTypeList?.aliases || {}

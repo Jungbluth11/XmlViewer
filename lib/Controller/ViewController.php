@@ -125,6 +125,40 @@ class ViewController extends Controller {
 	 * @NoCSRFRequired
 	 * @PublicPage
 	 */
+	public function parserScript(string $parser): Response {
+		if (preg_match('/^[A-Za-z0-9_-]+$/D', $parser) !== 1) {
+			return new Response(404);
+		}
+
+		$parserRoot = realpath(__DIR__ . '/../Parser');
+		$parserDirectory = $parserRoot === false ? false : realpath($parserRoot . DIRECTORY_SEPARATOR . $parser);
+		$scriptPath = $parserDirectory === false ? false : realpath($parserDirectory . DIRECTORY_SEPARATOR . 'script.js');
+
+		if ($parserRoot === false
+			|| $parserDirectory === false
+			|| $scriptPath === false
+			|| dirname($scriptPath) !== $parserDirectory
+			|| !str_starts_with($parserDirectory, $parserRoot . DIRECTORY_SEPARATOR)
+			|| !is_file($scriptPath)) {
+			return new Response(404);
+		}
+
+		return new DataDisplayResponse(
+			(string)file_get_contents($scriptPath),
+			200,
+			[
+				'Content-Type' => 'application/javascript; charset=utf-8',
+				'X-Content-Type-Options' => 'nosniff',
+				'Cache-Control' => 'public, max-age=3600',
+			],
+		);
+	}
+
+	/**
+	 * @NoAdminRequired
+	 * @NoCSRFRequired
+	 * @PublicPage
+	 */
 	public function downloadSharedFile(string $shareToken, int $fileId): Response {
 		try {
 			$share = $this->shareManager->getShareByToken($shareToken);
@@ -227,11 +261,16 @@ class ViewController extends Controller {
 		$parserStylesheetUrl = is_file($parserStylePath)
 			? $this->urlGenerator->linkToRoute('xmlviewer.view.parserStyle', ['parser' => $parserName])
 			: '';
+		$parserScriptPath = dirname($templatePath) . DIRECTORY_SEPARATOR . 'script.js';
+		$parserScriptUrl = is_file($parserScriptPath)
+			? $this->urlGenerator->linkToRoute('xmlviewer.view.parserScript', ['parser' => $parserName])
+			: '';
 
 		return new TemplateResponse('xmlviewer', 'parser', [
 			'title' => $file->getName(),
 			'templatePath' => $templatePath,
 			'parserStylesheetUrl' => $parserStylesheetUrl,
+			'parserScriptUrl' => $parserScriptUrl,
 			'data' => $viewData,
 			'backUrl' => $this->validatedFilesUrl($backUrl),
 			'isPublic' => $shareToken !== '',
