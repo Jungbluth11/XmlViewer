@@ -1,0 +1,82 @@
+name: Build and publish app release
+
+on:
+  push:
+    branches:
+      - main
+      - nextcloud-28-32
+    paths-ignore:
+      - .github/**
+      - "**/*.md"
+      - "**/*.gitignore"
+      - "**/*.gitattributes"
+  workflow_dispatch:
+  
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: xmlviewer-release
+      cancel-in-progress: false
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install build dependencies
+        run: npm ci
+
+      - name: Build JavaScript bundle
+        run: npm run build
+
+      - name: Package Nextcloud app
+        id: package
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="$(sed -n 's:.*<version>\([^<]*\)</version>.*:\1:p' appinfo/info.xml | head -n 1 | tr -d '[:space:]')"
+          if [[ -z "$version" ]]; then
+            echo 'Could not read the app version from appinfo/info.xml' >&2
+            exit 1
+          fi
+          archive="xmlviewer-${version}.zip"
+          tag="v${version}"
+          mkdir -p build/package/xmlviewer build/releases
+          cp -a appinfo css l10n lib templates js LICENSE README.md build/package/xmlviewer/
+          (
+            cd build/package
+            zip -qr "../releases/${archive}" xmlviewer
+          )
+          echo "archive=build/releases/${archive}" >> "$GITHUB_OUTPUT"
+          echo "tag=${tag}" >> "$GITHUB_OUTPUT"
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+
+      - name: Publish branch build release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag='${{ steps.package.outputs.tag }}'
+          version='${{ steps.package.outputs.version }}'
+          archive='${{ steps.package.outputs.archive }}'
+          title="XML Viewer ${version}"
+          notes="Automated Nextcloud app package for version ${version}, built from branch ${GITHUB_REF_NAME} at commit ${GITHUB_SHA}."
+
+          if gh release view "$tag" >/dev/null 2>&1; then
+            git tag --force "$tag" "$GITHUB_SHA"
+            git push --force origin "refs/tags/${tag}"
+            gh release edit "$tag" --target "$GITHUB_SHA" --title "$title" --notes "$notes"
+            gh release upload "$tag" "$archive" --clobber
+          else
+            gh release create "$tag" "$archive" --target "$GITHUB_SHA" --title "$title" --notes "$notes"
+          fi
